@@ -12,3 +12,6 @@ This project is based on the flask technology. To run it one must:
 3. run the flask application
     flask --app main run
 
+## Preparations for dev_dumpProcessing
+1. run "curl -s https://kaikki.org/dictionary/downloads/de/de-extract.json > data.json"
+2. create file data_german.json
