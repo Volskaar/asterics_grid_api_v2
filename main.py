@@ -3,7 +3,7 @@ from flask import request
 
 ####################################################################################
 
-import information_handling
+import data_processing
 
 ####################################################################################
  
@@ -15,8 +15,10 @@ app = Flask(__name__)
 # Routes with associated functions
 @app.route('/test')
 def test_print_wiktionary_data():
-    word = str(request.data)
-    return information_handling.get_word_information(word)
+    if data_processing.clean_data_dump():
+        return "Nice shit"
+    else:
+        return "Dipshit"
 
 ####################################################################################
  
