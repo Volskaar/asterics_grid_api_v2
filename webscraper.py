@@ -3,12 +3,6 @@ import pandas as pd
 import requests
 import json
 
-def call_web_scraper(verb):
-    dataframe = scrape_web(verb)
-    json = json_convert(dataframe)
-    return(json)
-
-
 def scrape_web(verb):
     pageToScrape = requests.get(f"https://de.wiktionary.org/wiki/Flexion:{verb}")
     soup = BeautifulSoup(pageToScrape.text, 'html.parser')
@@ -51,15 +45,39 @@ def scrape_web(verb):
     # Create a DataFrame using pandas
     data = {'Person': person_list, 'Indikativ': indikativ_list, 'Konjunktiv': konjunktiv1_list}
     df = pd.DataFrame(data)
+     
+    return df
 
-    print(df)     
-    return(df)
+#################################################################################################################
 
-def json_convert(dataframe):
-    json_result = []
+def add_tenses(dataframe):
+    result = []
+
+    cnt = 0
+    tenses = ["Präsens", "Präteritum", "Perfekt", "Plusquamperfekt", "FuturI", "FuturII"]
 
     for index, row in dataframe.iterrows():
         row_dict = row.to_dict()
-        json_result.append(row_dict)
 
-    return json.dumps(json_result, ensure_ascii=True, indent=4)
+        if row['Person'] == '1. Person Singular':
+            result.append({tenses[cnt]: []})
+        
+        result[-1][tenses[cnt]].append(row_dict)
+
+        if row['Person'] == '3. Person Plural':
+            cnt += 1
+
+    return result
+
+#################################################################################################################
+
+def convert_to_json(data):
+    return json.dumps(data, ensure_ascii=False, indent=4)
+
+#################################################################################################################
+
+def call_web_scraper(verb):
+    dataframe = scrape_web(verb)
+    data = add_tenses(dataframe)
+    json = convert_to_json(data)
+    return(json)
