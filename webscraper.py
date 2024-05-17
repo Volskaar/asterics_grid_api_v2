@@ -1,10 +1,15 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 import requests
+import json
+
+def call_web_scraper(verb):
+    dataframe = scrape_web(verb)
+    json = json_convert(dataframe)
+    return(json)
 
 
-def scrapWeb(verb):
- 
+def scrape_web(verb):
     pageToScrape = requests.get(f"https://de.wiktionary.org/wiki/Flexion:{verb}")
     soup = BeautifulSoup(pageToScrape.text, 'html.parser')
 
@@ -35,15 +40,15 @@ def scrapWeb(verb):
           # Create a DataFrame using pandas
     data = {'Person': person_list, 'Indikativ': indikativ_list, 'Konjunktiv': konjunktiv1_list}
     df = pd.DataFrame(data)
-           
-    return df
 
-            
+    print(df)     
+    return(df)
 
+def json_convert(dataframe):
+    json_result = []
 
-verb= input('Please enter a Verb: ')
-table_df = scrapWeb(verb)
-print(table_df)
+    for index, row in dataframe.iterrows():
+        row_dict = row.to_dict()
+        json_result.append(row_dict)
 
-#store output to excel file
-#table_df.to_excel('output.xlsx', index=False)
+    return json.dumps(json_result, ensure_ascii=True, indent=4)
