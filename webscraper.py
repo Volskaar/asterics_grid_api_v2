@@ -26,6 +26,12 @@ def scrape_web(verb):
         for tr in tr_elements:
             td_elements = tr.find_all('td')
             if len(td_elements) >= 3:  # Ensure the row has at least 3 td elements
+
+                # Watch out for  "er/sie/es" and add additional space btw person and verb 
+                for td in td_elements:
+                    if 'er/sie/es' in td.text:
+                        td.string = td.text.replace('er/sie/es', 'er/sie/es ')
+
                 person = td_elements[0].get_text(strip=True)
                 indikativ = td_elements[1].get_text(strip=True)
                 konjunktiv1 = td_elements[2].get_text(strip=True)
