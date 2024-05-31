@@ -56,34 +56,83 @@ def scrape_web(verb):
 
 #################################################################################################################
 
-def add_tenses(dataframe):
+def format_data(dataframe):
     result = []
-
-    cnt = 0
-    tenses = ["Präsens", "Präteritum", "Perfekt", "Plusquamperfekt", "FuturI", "FuturII"]
+    tenses = ["PRAESENS","PRAETERITUM","PERFEKT","PLUSQAMPERFEKT","FUTURI","FUTURII"]
+    tense_cnt = 0
+    words_per_tense = 0
 
     for index, row in dataframe.iterrows():
+        # convert row to dictionary
         row_dict = row.to_dict()
 
-        if row['Person'] == '1. Person Singular':
-            result.append({tenses[cnt]: []})
+        # extract person
+        person = row_dict['Person']
+
+        # create person tag
+        tag_person = ""
+        if "1." in person:
+            tag_person = "1.PERS"
+        elif "2." in person:
+            tag_person = "2.PERS"
+        elif "3." in person:
+            tag_person = "3.PERS"
+
+        # tenses tag
+        tag_tense = ""
+        tag_tense = tenses[tense_cnt]
+
+        words_per_tense += 1;
+
+        if words_per_tense == 6:
+            words_per_tense = 0
+            tense_cnt += 1
+
         
-        result[-1][tenses[cnt]].append(row_dict)
+        # create plural tag
+        tag_plural = ""
+        if "Plural" in person:
+            tag_plural = "PLURAL"
 
-        if row['Person'] == '3. Person Plural':
-            cnt += 1
+        tag_negation = ""
+        if "nicht" in row_dict['Indikativ']:
+            tag_negation = "NEGATION"
+        
+        # build output structure
+        if not tag_plural and not tag_negation:
+            entry = {
+                "value": row_dict['Indikativ'],
+                "tags": [tag_person, tag_tense]
+            }
+        elif not tag_plural:
+            entry = {
+                "value": row_dict['Indikativ'],
+                "tags": [tag_person, tag_tense, tag_negation]
+            }
+        elif not tag_negation:
+            entry = {
+                "value": row_dict['Indikativ'],
+                "tags": [tag_person, tag_tense, tag_plural]
+            }
+        else:
+            entry = {
+                "value": row_dict['Indikativ'],
+                "tags": [tag_person, tag_tense, tag_plural, tag_negation]
+            }
 
+        result.append(entry)
+    
     return result
 
 #################################################################################################################
 
 def convert_to_json(data):
-    return json.dumps(data, ensure_ascii=False, indent=4)
+    return json.dumps(data, ensure_ascii=False, indent=2)
 
 #################################################################################################################
 
 def call_web_scraper(verb):
     dataframe = scrape_web(verb)
-    data = add_tenses(dataframe)
+    data = format_data(dataframe)
     json = convert_to_json(data)
     return(json)
