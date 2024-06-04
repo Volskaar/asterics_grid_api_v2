@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, make_response
 from flask import request
 import webscraper
  
@@ -12,9 +12,10 @@ def webscraping():
     output_type = request.args.get('type')
 
     # create response data
-    response = webscraper.call_web_scraper(verb, output_type)
+    response_data = webscraper.call_web_scraper(verb, output_type)
+    response = make_response(response_data)
 
-    # set headers depending on data type
+    # create response headers depending on datatype
     if output_type == 'json':
         response.headers['Content-Type'] = 'application/json'
     elif output_type == 'csv':
@@ -23,6 +24,6 @@ def webscraping():
 
     return response
  
-# main driver function
+# main driver functions
 if __name__ == '__main__':
     app.run()

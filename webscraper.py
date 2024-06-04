@@ -1,3 +1,5 @@
+import csv
+import io
 from bs4 import BeautifulSoup
 import pandas as pd
 import requests
@@ -138,10 +140,23 @@ def convert_to_json(data):
 
 #################################################################################################################
 
-def convert_to_csv(dataframe):
-    #return data.to_csv(index=False)
-    #file_name = f".csv"
-    return dataframe.to_csv("output.csv", index=False)
+def convert_to_csv(data):
+    # create bytestream for csv output
+    # create csv writer instance
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # for every entry in data -> build row in csv
+    for item in data:
+        value = item["value"]
+        tags = ", ".join(item["tags"])
+        writer.writerow([value, tags])
+
+    # encode csv and close output bytestream
+    csv_data = output.getvalue().encode('utf-8')
+    output.close()
+
+    return csv_data
 
 
 #################################################################################################################
@@ -153,6 +168,6 @@ def call_web_scraper(verb, type):
     if type == 'json':
         output = convert_to_json(data)
     if type == 'csv':
-        output = convert_to_csv(dataframe)
+        output = convert_to_csv(data)
 
     return (output)
