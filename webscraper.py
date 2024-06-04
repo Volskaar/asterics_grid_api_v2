@@ -27,16 +27,20 @@ def scrape_web(verb):
             td_elements = tr.find_all('td')
             if len(td_elements) >= 3:  # Ensure the row has at least 3 td elements
 
-                # Watch out for  "er/sie/es" and add additional space btw person and verb 
-                for td in td_elements:
-                    if 'er/sie/es' in td.text:
-                        td.string = td.text.replace('er/sie/es', 'er/sie/es ')
+                # Combine all text elements inside td tags to get rid of the small attribute eg. -> smaller/sie/es lauft
+                person = ' '.join(td_elements[0].stripped_strings)
+                indikativ = ' '.join(td_elements[1].stripped_strings)
+                konjunktiv1 = ' '.join(td_elements[2].stripped_strings)
 
-                person = td_elements[0].get_text(strip=True)
-                indikativ = td_elements[1].get_text(strip=True)
-                konjunktiv1 = td_elements[2].get_text(strip=True)
-                if person and person != 'Person':  # Make sure person is not copied if it's the header
-                    if person and indikativ and konjunktiv1:  # if everything is filled append it
+                if person and person != 'Person':
+                    if person and indikativ and konjunktiv1:
+
+                        # Necessary to remove first word
+                        if ' ' in indikativ:
+                            indikativ = indikativ.split(' ', 1)[1]
+                        if ' ' in konjunktiv1:
+                            konjunktiv1 = konjunktiv1.split(' ', 1)[1]
+
                         person_list.append(person)
                         indikativ_list.append(indikativ)
                         konjunktiv1_list.append(konjunktiv1)
