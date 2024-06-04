@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import json
 
+
 def scrape_web(verb):
     pageToScrape = requests.get(f"https://de.wiktionary.org/wiki/Flexion:{verb}")
     soup = BeautifulSoup(pageToScrape.text, 'html.parser')
@@ -12,7 +13,7 @@ def scrape_web(verb):
     if not first_section:
         return pd.DataFrame()  # Return empty DataFrame if the section is not found
 
-    tables = first_section.find_all_next('table')  
+    tables = first_section.find_all_next('table')
 
     person_list = []
     indikativ_list = []
@@ -44,25 +45,26 @@ def scrape_web(verb):
                         person_list.append(person)
                         indikativ_list.append(indikativ)
                         konjunktiv1_list.append(konjunktiv1)
-        
+
         # Check if the table contains "Futur II"
         if any("Futur II" in td.get_text() for td in table.find_all('td')):
             futur2_found = True
-        
+
         if futur2_found:
             break
 
     # Create a DataFrame using pandas
     data = {'Person': person_list, 'Indikativ': indikativ_list, 'Konjunktiv': konjunktiv1_list}
     df = pd.DataFrame(data)
-     
+
     return df
+
 
 #################################################################################################################
 
 def format_data(dataframe):
     result = []
-    tenses = ["PRAESENS","PRAETERITUM","PERFEKT","PLUSQAMPERFEKT","FUTURI","FUTURII"]
+    tenses = ["PRAESENS", "PRAETERITUM", "PERFEKT", "PLUSQAMPERFEKT", "FUTURI", "FUTURII"]
     tense_cnt = 0
     words_per_tense = 0
 
@@ -92,7 +94,6 @@ def format_data(dataframe):
             words_per_tense = 0
             tense_cnt += 1
 
-        
         # create plural tag
         tag_plural = ""
         if "Plural" in person:
@@ -101,7 +102,7 @@ def format_data(dataframe):
         tag_negation = ""
         if "nicht" in row_dict['Indikativ']:
             tag_negation = "NEGATION"
-        
+
         # build output structure
         if not tag_plural and not tag_negation:
             entry = {
@@ -125,18 +126,33 @@ def format_data(dataframe):
             }
 
         result.append(entry)
-    
+
     return result
+
 
 #################################################################################################################
 
 def convert_to_json(data):
     return json.dumps(data, ensure_ascii=False, indent=2)
 
+
 #################################################################################################################
 
-def call_web_scraper(verb):
+def convert_to_csv(dataframe):
+    #return data.to_csv(index=False)
+    #file_name = f".csv"
+    return dataframe.to_csv("output.csv", index=False)
+
+
+#################################################################################################################
+
+def call_web_scraper(verb, type):
     dataframe = scrape_web(verb)
     data = format_data(dataframe)
-    json = convert_to_json(data)
-    return(json)
+
+    if type == 'json':
+        output = convert_to_json(data)
+    if type == 'csv':
+        output = convert_to_csv(dataframe)
+
+    return (output)

@@ -8,8 +8,6 @@ app = Flask(__name__)
  
 @app.route('/', methods=['POST'])
 def webscraping():
-    # get request body as string
-    # get request params
     verb = str(request.data.decode('UTF-8'))
     output_type = request.args.get('type')
 
