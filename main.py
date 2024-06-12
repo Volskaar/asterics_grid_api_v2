@@ -1,18 +1,19 @@
 from flask import Flask, jsonify, make_response
 from flask import request
+from flask_cors import CORS
 import webscraper
  
 # Flask constructor takes the name of 
 # current module (__name__) as argument.
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
  
-@app.route('/', methods=['POST'])
-def webscraping():
-    verb = str(request.data.decode('UTF-8'))
+@app.route('/<word>', methods=['GET'])
+def webscraping(word):
     output_type = request.args.get('type')
 
     # create response data
-    response_data = webscraper.call_web_scraper(verb, output_type)
+    response_data = webscraper.call_web_scraper(word, output_type)
     response = make_response(response_data)
 
     # create response headers depending on datatype
