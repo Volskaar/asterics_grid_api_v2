@@ -10,6 +10,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
  
 @app.route('/<word>', methods=['GET'])
 def webscraping(word):
+    word = word.lower()
     output_type = request.args.get('type')
 
     # create response data
