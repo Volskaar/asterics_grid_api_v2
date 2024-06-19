@@ -31,22 +31,45 @@ def scrape_web(verb):
             if len(td_elements) >= 3:  # Ensure the row has at least 3 td elements
 
                 # Combine all text elements inside td tags to get rid of the small attribute eg. -> smaller/sie/es lauft
+                
+                
                 person = ' '.join(td_elements[0].stripped_strings)
+
                 indikativ = ' '.join(td_elements[1].stripped_strings)
                 konjunktiv1 = ' '.join(td_elements[2].stripped_strings)
+
+                indikativ = indikativ.split()
+                konjunktiv1 = konjunktiv1.split()
 
                 if person and person != 'Person':
                     if person and indikativ and konjunktiv1:
 
-                        # Necessary to remove first word
-                        if ' ' in indikativ:
-                            indikativ = indikativ.split(' ', 1)[1]
-                        if ' ' in konjunktiv1:
-                            konjunktiv1 = konjunktiv1.split(' ', 1)[1]
+                        # Necessary to remove unwanted words
+                        if len(indikativ) > 1:
+                            # Find position from "," if there is any
+                            rest = ' '.join(indikativ[1:])
+                            comma_position = rest.find(',')
+
+                            # Extract everything before the comma
+                            if comma_position != -1:
+                                indikativOnlyVerb = rest[:comma_position]
+                            else:
+                                indikativOnlyVerb = rest
+
+                        if len(konjunktiv1) > 1:
+                            # Find position from "," if there is any
+                            rest = ' '.join(konjunktiv1[1:])
+                            comma_position = rest.find(',')
+
+                            # Extract everything before the comma
+                            if comma_position != -1:
+                                konjunktiv1OnlyVerb = rest[:comma_position]
+                            else:
+                                konjunktiv1OnlyVerb = rest
 
                         person_list.append(person)
-                        indikativ_list.append(indikativ)
-                        konjunktiv1_list.append(konjunktiv1)
+                        indikativ_list.append(indikativOnlyVerb)
+                        konjunktiv1_list.append(konjunktiv1OnlyVerb)
 
         # Check if the table contains "Futur II"
         if any("Futur II" in td.get_text() for td in table.find_all('td')):
@@ -90,7 +113,7 @@ def format_data(dataframe):
         tag_tense = ""
         tag_tense = tenses[tense_cnt]
 
-        words_per_tense += 1;
+        words_per_tense += 1
 
         if words_per_tense == 6:
             words_per_tense = 0
