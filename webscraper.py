@@ -131,21 +131,25 @@ def format_data(dataframe):
         # build output structure
         if not tag_plural and not tag_negation:
             entry = {
+                "lang": "de",
                 "value": row_dict['Indikativ'],
                 "tags": [tag_person, tag_tense]
             }
         elif not tag_plural:
             entry = {
+                "lang": "de",
                 "value": row_dict['Indikativ'],
                 "tags": [tag_person, tag_tense, tag_negation]
             }
         elif not tag_negation:
             entry = {
+                "lang": "de",
                 "value": row_dict['Indikativ'],
                 "tags": [tag_person, tag_tense, tag_plural]
             }
         else:
             entry = {
+                "lang": "de",
                 "value": row_dict['Indikativ'],
                 "tags": [tag_person, tag_tense, tag_plural, tag_negation]
             }
@@ -171,9 +175,10 @@ def convert_to_csv(data):
 
     # for every entry in data -> build row in csv
     for item in data:
+        lang = item["lang"]
         value = item["value"]
         tags = ", ".join(item["tags"])
-        writer.writerow([value, tags])
+        writer.writerow([lang, value, tags])
 
     # encode csv and close output bytestream
     csv_data = output.getvalue().encode('utf-8')
