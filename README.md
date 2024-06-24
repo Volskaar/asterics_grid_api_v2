@@ -12,3 +12,14 @@ This project is based on the flask technology. To run it one must:
 3. run the flask application
     flask --app main run
 
+##Download AsTeRICS locally 
+1. go to their github and clone the repo
+    -> https://github.com/asterics/AsTeRICS-Grid
+2. Go through their setup process
+3. Replace the file, named "editElementWordForms.vue" with the file with the same name we provide
+4. Start both applications
+5. Import word forms 
+6. Add actions to the pronouns by reading the instructions
+    -> https://github.com/asterics/AsTeRICS-Grid/blob/master/docs/documentation_user/10_word_forms.md#word-form-actions
+
+
